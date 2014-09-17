@@ -1,0 +1,233 @@
+-> [fact].  /* makes the interpreter ready to receive facts */
+-> different(yellow, red).
+-> different(red, yellow).
+-> different(yellow, blue).
+-> different(blue, yellow).
+-> different(blue, red).
+-> different(red, blue).
+-> mapb_coloring(A, B, C, D, E, F) :- 
+     different(A, B), different(A, C), different(A, D), different(A, F),
+     different(B, C), different(B, E), different(C, E), different(C, D),
+     different(D, E), different(E, F).
+-> [query].  /* makes the interpreter ready to answer queries */
+?- mapb_coloring(A, B, C, D, E, F).
+A = yellow
+B = red
+C = blue
+D = red
+E = yellow
+F = red
+yes
+?- [rule].
+-> member(X, [X|M]).
+-> member(X, [Y|M]) :- member(X, M).
+-> [query].
+?- member(3, [2, 3]).
+yes
+?- member(3, [2, 4]).
+no
+-> [query].
+?- member(X, [4, 3]).
+X = 4
+yes
+?- member(3, L), member(4, L).
+L = [3, 4|_M135]
+yes
+-> [query].
+?- mapb_coloring(A, B, C, D, E, F).
+A = yellow
+B = red
+C = blue
+D = red
+E = yellow
+F = red
+yes
+?- member(M, [1|nil]).
+M = 1
+yes
+-> [rule].
+-> imokay :- youreokay, hesokay.    /* clause 1 */
+-> youreokay :- theyreokay.         /* clause 2 */
+-> hesokay.                         /* clause 3 */
+-> theyreokay.                      /* clause 4 */
+-> [query].
+?- imokay.
+yes
+?- [rule].
+-> hesnotokay :- imnotokay.  /* clause 5 */
+-> shesokay :- hesnotokay.   /* clause 6 */
+-> shesokay :- theyreokay.   /* clause 7 */
+-> [query].
+?- shesokay.
+yes
+?- [rule].
+-> hesnotokay :- shesokay.   /* clause 8 */
+-> hesnotokay :- imokay.     /* clause 9 */
+-> [query].
+?- 12 is 10 + 2.
+yes
+?- X is 2 - 5.
+X = -3
+yes
+?- X is 10 * 10, Y is (X + 1) / 2.
+X = 100
+Y = 50
+yes
+?- [rule].
+-> addtoend([], X, [X]).
+-> addtoend([Y|L], X, [Y|M]) :- addtoend(L, X, M).
+-> [query].
+?- addtoend([3], 4, [3,4]).
+yes
+?- addtoend([3], 4, L).
+L = [3, 4]
+yes
+-> addtoend(L, 4, [3, 4]).
+L = [3]
+yes
+?- [rule].
+-> reverse([], []).
+-> reverse([X|L], M) :- reverse(L, N), addtoend(N, X, M).
+-> [query].
+?- reverse([1, 2], L).
+L = [2, 1]
+yes
+?- reverse(L, [1, 2]).
+L = [2, 1]
+yes
+?- [rule].
+-> append([], L, L).
+-> append([X|L], M, [X|N]) :- append(L, M, N).
+-> [query].
+?- append([3, 4], [5], [3, 4, 5]).
+yes
+?- append([3, 4], [5, 6], L).
+L = [3, 4, 5, 6]
+yes
+?- append(L1, L2, [5, 6, 7]).
+L1 = []
+L2 = [5, 6, 7]
+yes
+?- [rule].
+-> member2(X, L) :- append(L1, [X|L2], L).
+-> find(K, A, L) :- member(pair(K, A), L).
+-> capitals([pair(chile, santiago), pair(peru, lima)]).
+-> [query].
+?- capitals(C), find(peru, CapitalOfPeru, C).
+C = [pair(chile, santiago), pair(peru, lima)]
+CapitalOfPeru = lima
+yes
+?- [rule].
+-> power(X, 0, 1).
+-> power(X, N, Z) :- N > 0, N1 is N - 1, power(X, N1, Z1), Z is Z1 * X.
+-> [query].
+?- power(3, 5, X).
+X = 243
+yes
+?- power(3, N, 27).
+run-time error: Used comparison > on non-integer term
+?- [rule].
+-> fac(0, 1).
+-> fac(N, R) :- N1 is N - 1, fac(N1, R1), R is N * R1.
+?- [rule].
+-> naive_sort(L, M) :- permutation(L, M), ordered(M).
+-> ordered([]).
+-> ordered([A]).
+-> ordered([A, B|L]) :- A =< B, ordered([B|L]).
+-> permutation([], []).
+-> permutation(L, [H|T]) :- append(V, [H|U], L), append(V, U, W), permutation(W, T).
+-> [query].
+?- naive_sort([4, 2, 3], L).
+L = [2, 3, 4]
+yes
+?- [rule].
+-> partition(H, [A|X], [A|Y], Z) :- A =< H, partition(H, X, Y, Z).
+-> partition(H, [A|X], Y, [A|Z]) :- H < A,  partition(H, X, Y, Z).
+-> partition(H, [], [], []).
+-> quicksort([], []).
+-> quicksort([H|T], S) :- 
+      partition(H, T, A, B), 
+      quicksort(A, A1), quicksort(B, B1),
+      append(A1, [H|B1], S).
+-> [query].
+?- quicksort([8, 2, 3, 7, 1], S).
+S = [1, 2, 3, 7, 8]
+yes
+?- [rule].
+-> simplify(diff(X, X), []).
+-> simplify(diff([X|Y], Z), [X|W]) :- simplify(diff(Y, Z), W).
+-> [query].
+?- simplify(diff([3, 4|X], X), L).
+X = _X5431
+L = [3, 4]
+yes
+?- simplify(L, [3, 4]).
+L = diff([3, 4|_X5658], _X5658)
+yes
+?- [rule].
+-> diffappend(diff(L, X), diff(X, Y), diff(L, Y)).
+-> [query].
+?- diffappend(diff([3|X], X), diff([4|Y], Y), Z).
+X = [4|_Y5738]
+Y = _Y5738
+Z = diff([3, 4|_Y5738], _Y5738)
+yes
+?- [rule].
+-> block(a).
+-> block(b).
+-> block(c).
+-> different(a, b).  different(b, a).
+-> different(a, c).  different(c, a).
+-> different(b, c).  different(c, b).
+-> different(X, table) :- block(X).
+-> different(table, Y) :- block(Y).
+-> clear(Surface, []).
+-> clear(Surface, [on(Block, S2)|State]) :-
+     different(Surface, S2), clear(Surface, State).
+-> on(X, Y, State) :- member(on(X, Y), State).
+-> update(move(Block, From, To), [on(Block, From)|S], [on(Block, To)|S]).
+-> update(move(Block, From, To), [on(B2, Surface)|S1], [on(B2, Surface)|S2]) :-
+     different(Block, B2), update(move(Block, From, To), S1, S2).
+-> legal_move(move(B, From, table), State) :- 
+      on(B, From, State), different(From, table), clear(B, State).
+-> legal_move(move(B1, From, B2), State) :- 
+      block(B2), on(B1, From, State), 
+      different(From, B2), different(B1, B2), 
+      clear(B1, State), clear(B2, State).
+-> transform(State, State, Visited, []).
+-> transform(State1, State2, Visited, [Move|Moves]) :- 
+     legal_move(Move, State1), 
+     update(Move, State1, State), 
+     not_member(State, Visited), 
+     transform(State, State2, [State|Visited], Moves).
+-> transform(State1, State2, Plan) :- transform(State1, State2, [], Plan).
+-> not_member(X, []).
+-> not_member(X, [Y|L]) :- different(X, Y), not_member(X, L).
+-> different([on(A, X)|State1], [on(A, Y)|State2]) :- different(X, Y).
+-> different([on(A, X)|State1], [on(A, X)|State2]) :- different(State1, State2).
+-> state1([on(a, b), on(b, table), on(c, a)]).
+-> state2([on(a, b), on(b, c), on(c, table)]).
+-> [query].
+?- state1(S1), state2(S2), transform(S1, S2, Plan).
+S1 = [on(a, b), on(b, table), on(c, a)]
+S2 = [on(a, b), on(b, c), on(c, table)]
+Plan = [move(c, a, table), move(a, b, table), move(b, table, a), move(b, a, c), move(a, table, b)]
+yes
+?- [rule].
+-> transform2(State, State, Visited, []).
+-> transform2(State1, State2, Visited, [Move|Moves]) :- 
+     choose_move(Move, State1, State2), 
+     update(Move, State1, State), 
+     not_member(State, Visited), 
+     transform2(State, State2, [State|Visited], Moves).
+-> transform2(State1, State2, Plan) :- transform2(State1, State2, [], Plan).
+-> choose_move(Move, State1, State2) :- 
+     suggest(Move, State2), legal_move(Move, State1).
+-> choose_move(Move, State1, State2) :- legal_move(Move, State1).
+-> suggest(move(X, Y, Z), State) :- member(on(X, Z), State).
+-> [query].
+?- state1(S1), state2(S2), transform2(S1, S2, Plan).
+S1 = [on(a, b), on(b, table), on(c, a)]
+S2 = [on(a, b), on(b, c), on(c, table)]
+Plan = [move(c, a, table), move(a, b, table), move(b, table, c), move(a, table, b)]
+yes

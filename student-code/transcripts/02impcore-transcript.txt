@@ -1,0 +1,68 @@
+-> 3
+3
+-> (+ 4 7)
+11
+-> it
+11
+-> (val x 4)
+4
+-> (+ x x)
+8
+-> (print x)
+4
+4
+-> (val y 5)
+5
+-> (begin (print x) (print y) (* x y))
+4
+5
+20
+-> (if (> y 0) 5 10)
+5
+-> (while (> y 0)
+     (begin
+       (set x (+ x x))
+       (set y (- y 1))))
+0
+-> x
+128
+-> (define add1 (x) (+ x 1))
+add1
+-> (add1 4)
+5
+-> (define double (x) (+ x x))
+double
+-> (double 4)
+8
+-> x
+128
+-> (define addx (x y) (set x (+ x y)))
+addx
+-> (addx x 1)
+129
+-> x
+128
+-> (define not (b) (if b 0 1))
+-> (define != (x y) (not (= x y)))
+-> (define mod (m n) (- m (* n (/ m n))))
+-> (val r 0)
+0
+-> (define gcd (m n)
+     (begin
+       (while (!= (set r (mod m n)) 0)
+         (begin
+           (set m n)
+           (set n r)))
+       n))
+-> (gcd 6 15)
+3
+-> (define gcd (m n)
+     (if (= n 0)
+       m 
+       (gcd n (mod m n))))
+-> (val x 2)
+2
+-> (define x (y) (+ x y))
+-> (define z (x) (x x))
+-> (z 4)
+6

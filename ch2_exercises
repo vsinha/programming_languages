@@ -1,0 +1,178 @@
+;(val sigma_sum 0)
+;(define sigma_while (m n)
+;  (begin
+;    (set sigma_sum n)
+;    (while (< m n) 
+;      (begin 
+;        (set sigma_sum (+ sigma_sum m))
+;        (set m (+ m 1))))
+;   sigma_sum))
+
+(define sigma (m n)
+  (sigma' m n n))
+
+(define sigma' (m n sum) 
+  (begin
+    (if (< m n) 
+      (sigma' (+ m 1) n (+ sum m))
+      sum)))
+
+;(val exp_total 0)
+;(define exp_while (m n)
+;  (begin
+;    (set exp_total m)
+;    (while (> n 1) 
+;      (begin
+;        (set exp_total (* exp_total m))
+;        (set n (- n 1))))
+;  exp_total))
+
+
+(define exp (m n)
+  (exp' m n m))
+
+(define exp' (m n total)
+  (if (> n 1)
+    (exp' m (- n 1) (* total m))
+    total))
+  
+
+(define <= (x y) (not (> x y)))
+(define >= (x y) (not (< x y)))
+
+(define choose (n k) 
+  (if (>= n 0) 
+    (if (= k 0) 1 
+      (if (= k n) 1
+        (+ (choose (- n 1) k) (choose (- n 1) (- k 1)))))
+   0))
+
+
+(define fib (m)
+  (if (= m 0) 0
+    (if (= m 1) 1
+      (+ (fib (- m 1)) (fib (- m 2))))))
+
+
+; (val prime_divisor 2)
+; (val prime_result 1)
+; (define prime_while? (n) 
+;   (begin 
+;     (set prime_divisor 2)
+;     (set prime_result 1)
+;     (if (= n 1) 
+;       (set prime_result 0)
+;       (begin
+;         ; divide all numbers up until half of n
+;         (while (<= prime_divisor (/ n 2))
+;         (begin 
+;           ; if the number divides cleanly, we don't have a prime
+;           (if (= 0 (mod n prime_divisor)) 
+;             (set prime_result 0)
+;             (set prime_result prime_result))
+;           ; increment the divisor
+;           (set prime_divisor (+ prime_divisor 1))))))
+;   prime_result))
+
+
+(define prime? (n)
+  (if (= n 1) 0 
+    (prime?' n 2 )))
+
+(define prime?' (n divisor)
+    (if (= n divisor) 1
+      (if (= 0 (mod n divisor)) 0 
+        (prime?' n (+ divisor 1)))))
+
+
+; (val test_prime 0)
+; (define nthprime_while (n) 
+;   (begin
+;     (set test_prime 2)
+;     (while (> n 0)
+;       (begin
+;         (set test_prime (+ test_prime 1))
+;         (if (prime? test_prime)
+;           (set n (- n 1)) 0)))
+;     test_prime))
+
+
+(define nthprime (n)
+  (if (= n 0) 
+    0
+    (nthprime' (- n 1) 2)))
+
+(define nthprime' (n test_prime)
+    (if (prime? test_prime)
+      (if (= n 0) 
+        test_prime
+        (nthprime' (- n 1) (+ test_prime 1)))
+      (nthprime' n (+ test_prime 1))))
+
+
+; (val i 0)
+; (val total 0)
+; (define sumprimes_while (n) 
+;   (begin
+;     (set i 0)
+;     (set total 0)
+;     (while (< i n)
+;       (begin
+;         (set total (+ total (nthprime i)))
+;         (set i (+ i 1))))
+;     total))
+
+
+(define sumprimes (n)
+  (sumprimes' n 2 2))
+
+(define sumprimes' (n i total)
+  (if (<= i n) 
+    (sumprimes' n (+ i 1) (+ total (nthprime i)))
+    total))
+
+
+(define relprime? (m n) 
+  (if (< m n) 
+    (relprime?' m n 1)
+    (relprime?' n m 1)))
+
+; for every number up to m, try to divide n, if we succeed
+(define relprime?' (m n result)
+  (begin
+    ; recurse all the way down
+    (if (> 1 m)
+      (set result (relprime?' (- m 1) n))
+      result
+    )
+    ; attempt to divide cleanly
+    (if (= 0 (mod n m))
+      (set result 0)
+      (set result result)
+    )
+  )
+)
+    
+
+
+(define binary (m) 
+  (binary' m 0))
+
+(define binary' (m binaryNum)
+  (begin
+    (if (!= 0 (/ m 2))
+      ; recurse until we get to m/2 == 0
+      (set binaryNum (binary' (/ m 2) binaryNum))
+      ; else return binaryNum
+      binaryNum
+    )
+    ; check the remainder and build up binaryNum
+    (begin
+      (set binaryNum (* binaryNum 10))
+      (set binaryNum (+ binaryNum (mod m 2)))
+    )
+    binaryNum
+  )
+)
+
+

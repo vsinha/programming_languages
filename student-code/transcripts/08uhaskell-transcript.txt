@@ -1,0 +1,498 @@
+-> (val-rec ones (cons 1 ones))
+... : int list
+-> (car ones)
+1 : int
+-> (val-rec nats (cons 0 (map ((curry +) 1) nats)))
+... : int list
+-> (car nats)
+0 : int
+-> nats
+(0 . ...) : int list
+-> (cdr nats)
+(... . ...) : int list
+-> (cdr nats)
+(... . ...) : int list
+-> (take 10 nats)
+(... . ...) : int list
+-> (full (take 10 nats))
+(0 1 2 3 4 5 6 7 8 9) : int list
+-> nats
+(0 1 2 3 4 5 6 7 8 9 . ...) : int list
+-> (define square (n) (* n n))
+... : int -> int
+-> (val squares (map square nats))
+... : int list
+-> (full (take 13 squares))
+(0 1 4 9 16 25 36 49 64 81 100 121 144) : int list
+-> nats
+(0 1 2 3 4 5 6 7 8 9 10 11 12 . ...) : int list
+-> (car (drop 19 squares))
+361 : int
+-> squares
+(0 1 4 9 16 25 36 49 64 81 100 121 144 ... ... ... ... ... ... 361 . ...) : int list
+-> (val xs (map ((curry +) 1) '(2 3)))
+-> xs
+(... . ...) : int list
+-> (cadr xs)
+4 : int
+-> xs
+(... 4 . ...) : int list
+-> (car xs)
+3 : int
+-> xs
+(3 4 . ...) : int list
+-> (cddr xs)
+() : int list
+-> xs
+(3 4) : int list
+-> (val xs (map ((curry +) 1) '(2 3)))
+-> xs
+(... . ...) : int list
+-> (full xs)
+(3 4) : int list
+-> (val sf 1000) ; scaling factor
+-> (define scale   (n) (* n sf))
+-> (define unscale (n) (/ n sf))
+-> (define +s (x y) (+ x y))
+-> (define -s (x y) (- x y))
+-> (define *s (x y) (/ (* x y) sf))
+-> (define /s (x y) (/ (* x sf) y))
+-> (define approximate-roots (n)
+     (letrec ((scaled-n (scale n))
+              (roots-from (lambda (x_i)
+                             (let ((next (/ (+s x_i (/s scaled-n x_i)) 2)))
+                                (cons x_i (roots-from next))))))
+        (roots-from scaled-n)))
+-> (val three (approximate-roots 9))                           
+... : int list
+-> (take 10 three)
+(... . ...) : int list
+-> (full (take 10 three))
+(9000 5000 3400 3023 3000 3000 3000 3000 3000 3000) : int list
+-> (full (take 10 (approximate-roots 2)))
+(2000 1500 1416 1414 1414 1414 1414 1414 1414 1414) : int list
+-> (*s 1414 1414)
+1999 : int
+-> (*s 1415 1415)
+2002 : int
+-> (define convergent-x (converged? xs)
+      (if (converged? xs) (car xs) (convergent-x converged? (cdr xs))))
+-> (define abs (n) (if (< n 0) (- 0 n) n))
+-> (define abs-conv (epsilon) 
+      (lambda (xs) (< (abs (- (car xs) (cadr xs))) epsilon)))
+-> (val eq-conv
+      (lambda (xs) (= (car xs) (cadr xs))))
+-> (define abs-sqrt (n)
+      (convergent-x (abs-conv 5) (approximate-roots n)))
+-> (abs-sqrt 9)
+3000 : int
+-> (abs-sqrt 2)
+1416 : int
+-> (define exact-sqrt (n)
+      (convergent-x eq-conv (approximate-roots n)))
+-> (exact-sqrt 9)
+3000 : int
+-> (exact-sqrt 2)
+1414 : int
+-> (define approximations (n next)
+     (letrec ((scaled-n (scale n))
+              (xs-from (lambda (x_i) (cons x_i (xs-from (next scaled-n x_i))))))
+        (xs-from scaled-n)))
+-> (define sqrt-next (n x) (/ (+s x (/s n x)) 2))
+-> (define cbrt-next (n x) (/ (+s x (/s n (*s x x))) 2))
+-> (define exact-approx (next n)
+      (convergent-x eq-conv (approximations n next)))
+-> (exact-approx sqrt-next 27)
+5196 : int
+-> (exact-approx cbrt-next 27)
+3000 : int
+-> (exact-approx sqrt-next 25)
+5000 : int
+-> (exact-approx cbrt-next 25)
+2924 : int
+-> (define divides (m n) (= (mod n m) 0))
+-> (define remove-multiples (k ns)
+      (filter (lambda (n) (not (divides k n))) ns))
+-> (define sieve (ns)
+      (case ns
+         (()  '())
+         ((cons m ms)  (cons m (sieve (remove-multiples m ms))))))
+-> (define integer-range (lo hi) ;; integers i s.t. lo <= i < hi
+      (if (>= lo hi) '()
+          (cons lo (integer-range (+ 1 lo) hi))))
+-> (define primes<= (n) (sieve (integer-range 2 n)))
+-> (full (primes<= 100))
+(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97) : int list
+-> (define primes<= (n) (sieve (drop 2 (take n nats))))
+-> (full (primes<= 100))
+(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97) : int list
+-> (define first-n-primes (n) (take n (sieve (drop 2 nats))))
+-> (full (first-n-primes 10))
+-> (full (take 10 (dropwhile (lambda (p) (< p 1000)) (sieve (drop 2 nats)))))
+(1009 1013 1019 1021 1031 1033 1039 1049 1051 1061) : int list
+-> (val primes (sieve (drop 2 nats)))
+-> (full (take 10 primes))
+(2 3 5 7 11 13 17 19 23 29) : int list
+-> (val slow-primes primes)
+-> (val primes
+      (letrec ((primes (cons 2 (filter prime? (drop 3 nats))))
+               (relevant (lambda (p n) (<= (square p) n)))
+               (prime? (lambda (n) ; no relevant prime divides n
+                          (not (exists? (lambda (p) (divides p n))
+                                  (takewhile (lambda (p) (relevant p n)) primes))))))
+       primes))
+... : int list
+-> (define fib (n)
+      (if (<= n 1)
+          n
+          (+ (fib (- n 1)) (fib (- n 2)))))
+-> (val slow-fibonacci fib)
+-> (slow-fibonacci 6)
+8 : int
+-> (val-rec fib
+      (letrec ((fibs (map fib$ nats))
+               (fib$ (lambda (n)
+                        (if (<= n 1)
+                            n
+                            (+ (fib (- n 1)) (fib (- n 2)))))))
+       (lambda (n) (nth fibs n))))
+... : int -> int
+-> (fib 6)
+8 : int
+-> (fib 20)
+6765 : int
+-> (fib 42)
+267914296 : int
+-> (vcon Sym (function (sym) formula))
+-> (vcon Not (function (formula) formula))
+-> (vcon And (function ((list formula)) formula))
+-> (vcon Or (function ((list formula)) formula))
+-> (define satisfies? (rho f)
+      (let ((sat? ((curry satisfies?) rho)))
+           (case f
+                ((Sym x)  (and (isbound? x rho) (find x rho)))
+                ((Not f1) (not (sat? f1)))
+                ((And fs) (all? sat? fs))
+                ((Or  fs) (exists? sat? fs)))))
+-> (val x (Sym 'x))
+-> (val y (Sym 'y))
+-> (define or2  (f1 f2) (Or  (list2 f1 f2)))
+-> (define and2 (f1 f2) (And (list2 f1 f2)))
+-> (satisfies? (list2 (pair 'x #t) (pair 'y #f))
+               (and2 x (Not y)))
+#t : bool
+-> (satisfies? (list2 (pair 'x #t) (pair 'y #f))
+               (and2 x (Not x)))
+#f : bool
+-> (define symbols-in (f)
+      (case f
+         ((Sym x)  (list1 x))
+         ((Not f1) (symbols-in f1))
+         ((And fs) (foldl union '() (map symbols-in fs)))
+         ((Or  fs) (foldl union '() (map symbols-in fs)))))
+-> (full (symbols-in (and2 x (Not y))))
+(x y) : sym list
+-> (full (symbols-in (Not (or2 x (and2 (or2 (Not x) y) (or2 (Not x) (Not y)))))))
+(x y) : sym list
+-> (define all-assignments-to (vars)
+      (case vars
+         (() (list1 '()))
+         ((cons x xs) (let ((rhos (all-assignments-to xs))
+                            (extend (lambda (v) (lambda (rho) (cons (pair x v) rho)))))
+                           (append (map (extend #t) rhos) (map (extend #f) rhos))))))
+-> (length (all-assignments-to '(x y)))
+4 : int
+-> (full (car (all-assignments-to '(x y))))
+((pair x #t) (pair y #t)) : (sym, bool) pair list
+-> (define satisfiable? (f)
+      (exists? (lambda (rho) (satisfies? rho f))
+               (all-assignments-to (symbols-in f))))
+-> (satisfiable? x)
+#t : bool
+-> (satisfiable? (and2 x (Not y)))
+#t : bool
+-> (satisfiable? (and2 x (Not x)))
+#f : bool
+-> (define natural-width (syms)
+     (case syms (() 0)
+                ((cons sym syms) (foldl (lambda (sym n) (+ 1 (+ (symwidth sym) n)))
+                                        (symwidth sym) syms))))
+... : sym list -> int
+-> (natural-width '(Lincoln))
+7 : int
+-> (natural-width '(Abraham))
+7 : int
+-> (natural-width '(Abraham Lincoln))
+15 : int
+-> (define greedy-fill (words target-width)
+     (letrec ((add (lambda (prev^ words)
+                     (case words
+                       (() (if (null? prev^)
+                               '()
+                               (list1 (reverse prev^))))
+                       ((cons word rest)
+                           (if (<= (natural-width (cons word prev^)) target-width)
+                               (add (cons word prev^) rest)
+                               (if (null? prev^)
+                                   (cons (list1 word)    (add '() rest))
+                                   (cons (reverse prev^) (add '() words)))))))))
+       (add '() words)))
+... : sym list * int -> sym list list
+-> (val gettysburg
+    '((Four score and seven years ago our fathers brought forth on
+       this continent a new nation, conceived in liberty, and
+       dedicated to the proposition that all men are created equal.
+      )
+      (Now we are engaged in a great civil war, testing whether that
+       nation, or any nation, so conceived and so dedicated, can long
+       endure.
+       We are met on a great battle-field of that war. We have
+       come to dedicate a portion of that field, as a final resting
+       place for those who here gave their lives that that nation
+       might live. It is altogether fitting and proper that we should
+       do this.
+      )
+      (But, in a larger sense, we can not dedicate, we can
+       not consecrate, we can not hallow this ground. The brave men,
+       living and dead, who struggled here, have consecrated it, far
+       above our poor power to add or detract. The world will little
+       note, nor long remember what we say here, but it can never
+       forget what they did here. It is for us the living, rather, to
+       be dedicated here to the unfinished work which they who fought
+       here have thus far so nobly advanced. It is rather for us to be
+       here dedicated to the great task remaining before us --- that from
+       these honored dead we take increased devotion to that cause for
+       which they gave the last full measure of devotion --- that we here
+       highly resolve that these dead shall not have died in vain --- that
+       this nation, under God, shall have a new birth of freedom --- and
+       that government of the people, by the people, for the people,
+       shall not perish from the earth.)))
+... : sym list list
+-> (define fill-and-print (fill paragraphs)
+     (let* ((filled (map fill paragraphs))
+            (print-lines            (lambda (lines) (mapM_ print lines)))
+            (print-space-then-lines (lambda (lines) (>> (print '-)
+                                                        (print-lines lines)))))
+        (case filled
+           (() (return unit))
+           ((cons p ps) (>> (print-lines p)
+                            (mapM_ print-space-then-lines ps))))))
+... : forall 'a, 'b . ('a -> 'b list) * 'a list -> unit io
+-> (fill-and-print (lambda (ws) (greedy-fill ws 60)) gettysburg)
+(Four score and seven years ago our fathers brought forth on)
+(this continent a new nation, conceived in liberty, and)
+(dedicated to the proposition that all men are created equal.)
+-
+(Now we are engaged in a great civil war, testing whether)
+(that nation, or any nation, so conceived and so dedicated,)
+(can long endure. We are met on a great battle-field of that)
+(war. We have come to dedicate a portion of that field, as a)
+(final resting place for those who here gave their lives that)
+(that nation might live. It is altogether fitting and proper)
+(that we should do this.)
+-
+(But, in a larger sense, we can not dedicate, we can not)
+(consecrate, we can not hallow this ground. The brave men,)
+(living and dead, who struggled here, have consecrated it,)
+(far above our poor power to add or detract. The world will)
+(little note, nor long remember what we say here, but it can)
+(never forget what they did here. It is for us the living,)
+(rather, to be dedicated here to the unfinished work which)
+(they who fought here have thus far so nobly advanced. It is)
+(rather for us to be here dedicated to the great task)
+(remaining before us --- that from these honored dead we take)
+(increased devotion to that cause for which they gave the)
+(last full measure of devotion --- that we here highly)
+(resolve that these dead shall not have died in vain --- that)
+(this nation, under God, shall have a new birth of freedom)
+(--- and that government of the people, by the people, for)
+(the people, shall not perish from the earth.)
+-> (val infinite-badness 10000)
+-> (vcon *t (function (int int) trace))
+-> (vcon /t (function (int int) trace))
+-> (vcon +t (function (int int) trace))
+-> (vcon product (function (int) trace))
+-> (define tr (con n) (trace (con n) n))
+-> (val *d (lambda (x y) (tr product (trace (*t x y) (* (trace 'number-x x) (trace 'number-y y))))))
+... : int * int -> int
+-> (val /d (lambda (x y) (trace (/t x y) (/ x y))))
+... : int * int -> int
+-> (val +d (lambda (x y) (trace (+t x y) (+ x y))))
+... : int * int -> int
+-> (define cube (x) (* x (* x x)))
+... : int -> int
+-> (define square (x) (* x x))
+... : int -> int
+-> (define glue-badness (t s) ; about 100 (t/s)^3 (after TeX the program S108)
+      (if (= t 0) 0
+          (if (<= s 0) infinite-badness
+              (let ((ratio  ;; about alpha t / s, where alpha^3 = 100 * 2^18
+                         (/ (* t 297) s))) ; 297^3 = 99.94 * 2^18
+                (if (>= ratio 1024) ; cube won't fit in 2^30 
+                    infinite-badness
+                    (/ (+ (cube ratio) 131072) 262144))))))
+... : int * int -> int
+-> (glue-badness 5 2)
+1558 : int
+-> (define line-badness (target-width shrink stretch words)
+      (let ((len (natural-width words)))
+         (if (<= len target-width)
+             (glue-badness (- target-width len) stretch)
+             (glue-badness (- len target-width) shrink))))
+-> (line-badness 7 1 1 '(ate my))
+100 : int
+-> (line-badness 7 1 1 '(ate my code))
+10000 : int
+-> (val line-penalty 10)
+-> (define line-demerits (badness)
+      (square (+ line-penalty badness)))
+... : int -> int
+-> (vcon mk-break (function (int (option (pair break (list sym)))) break))
+mk-break : int * (break, sym list) pair option -> break
+-> (define demerits (break)
+     (case break
+       ((mk-break d prev) d)))
+... : break -> int
+-> (define prev-break (break)
+     (case break
+       ((mk-break d prev) prev)))
+... : break -> (break, sym list) pair option
+-> (define paragraph-of-break (break)
+     (letrec ((addlines (lambda (break tail)
+                          (case (prev-break break)
+                            (none tail)
+                            ((some break-and-line)
+                                  (addlines (fst break-and-line)
+                                            (cons (snd break-and-line) tail)))))))
+       (addlines break '())))
+... : break -> sym list list
+-> (define min-demerits (breaks)
+     (case breaks
+       (()    (error 'minimum-of-an-empty-list-of-break-points))
+       ((cons b bs)
+              (let ((min (lambda (b1 b2)
+                             (if (< (demerits b2) (demerits b1)) b2 b1))))
+                (foldl min b bs)))))
+... : break list -> break
+-> (define candidate-lines (best-break words^)
+     (letrec ((ending-with
+                (lambda (prevwords^ tail)
+                   ; prevwords contains the words preceding this point.
+                   ; tail contains the words between this point and the
+                   ; end of the paragraph.
+                   ; INVARIANT: (append (reverse prevwords^) tail) == (reverse words^)
+                   (case prevwords^
+                     (() '()) ; if there are no words, there are no candidates
+                     ((cons w ws)
+                          (cons (pair (best-break ws) (cons w tail))
+                                (ending-with ws (cons w tail))))))))
+       (ending-with words^ '())))
+... : forall 'a, 'b . ('a list -> 'b) * 'a list -> ('b, 'a list) pair list
+-> (val dog-ate '(The dog ate my code oh yes he did))
+-> (mapM_ print (candidate-lines (lambda (_) (mk-break 0 none)) (reverse dog-ate)))
+(pair (mk-break 0 none) (did))
+(pair (mk-break 0 none) (he did))
+(pair (mk-break 0 none) (yes he did))
+(pair (mk-break 0 none) (oh yes he did))
+(pair (mk-break 0 none) (code oh yes he did))
+(pair (mk-break 0 none) (my code oh yes he did))
+(pair (mk-break 0 none) (ate my code oh yes he did))
+(pair (mk-break 0 none) (dog ate my code oh yes he did))
+(pair (mk-break 0 none) (The dog ate my code oh yes he did))
+-> (define overfull-cutoff (line-too-wide? candidates)
+      (case candidates
+        (()     '())
+        ((cons c cs) (if (line-too-wide? (snd c)) (list1 c)
+                         (cons c (overfull-cutoff line-too-wide? cs))))))
+-> (define best-break (line-too-wide? ordinary-badness last-badness words)
+      (letrec
+          ((best     (lambda (this-badness) (lambda (words^)
+                        (if (null? words^)
+                            (mk-break 0 none)
+                            (min-demerits
+                               (map (break-at this-badness)
+                                    (overfull-cutoff
+                                        line-too-wide?
+                                        (candidate-lines best-ordinary words^))))))))
+           (best-ordinary (best ordinary-badness))
+           (break-at (lambda (this-badness) (lambda (candidate)
+                        (let* ((line       (snd candidate))
+                               (prev-break (fst candidate))
+                               (d          (+ (line-demerits (this-badness line))
+                                              (demerits prev-break))))
+                          (mk-break d (some (pair prev-break line))))))))
+        ((best last-badness) (reverse words))))
+... : (sym list -> bool) * (sym list -> int) * (sym list -> int) * sym list -> break
+-> (define knuth-plass-fill-with-bb (best-break)
+     (lambda (target-width shrink stretch) 
+       (lambda (words)
+         (let* ((ordinary-badness  (lambda (words) (line-badness target-width shrink stretch words)))
+                (last-badness      (lambda (words) (line-badness target-width shrink
+                                                                 (* 10 target-width) words)))
+                (max-4-times-width (* 5 (+ target-width shrink)))
+                (line-too-wide?    (lambda (words) (> (* 4 (natural-width words)) max-4-times-width)))
+                (the-best
+                   (best-break line-too-wide? ordinary-badness last-badness words)))
+           (paragraph-of-break the-best)))))
+-> (val knuth-plass-fill (knuth-plass-fill-with-bb best-break))
+... : int * int * int -> (sym list -> sym list list)
+-> (fill-and-print (knuth-plass-fill 7 1 2) (list1 dog-ate))
+(The dog)
+(ate my)
+(code oh)
+(yes he)
+(did)
+-> (define memo-best-break (line-too-wide? badness last-badness words)
+      (letrec
+          ((memo      (map (best badness) (reverse (tails (reverse words)))))
+           (best      (lambda (this-badness) (lambda (words^)
+                          (if (null? words^)
+                              (mk-break 0 none)
+                              (min-demerits
+                                  (map (break-at this-badness)
+                                       (overfull-cutoff
+                                           line-too-wide?
+                                           (candidate-lines best-ordinary words^))))))))
+           (best-ordinary (lambda (words^)
+                              (car (drop (length words^) memo))))
+           (break-at (lambda (this-badness) (lambda (candidate)
+                        (let* ((line       (snd candidate))
+                               (prev-break (fst candidate))
+                               (d          (+ (line-demerits (this-badness line))
+                                              (demerits prev-break))))
+                          (mk-break d (some (pair prev-break line))))))))
+        ((best last-badness) (reverse words))))
+... : (sym list -> bool) * (sym list -> int) * (sym list -> int) * sym list -> break
+-> (full (reverse (tails (reverse '(Cats chase mice.)))))
+(() (Cats) (chase Cats) (mice. chase Cats)) : sym list list
+-> (val memo-knuth-plass-fill (knuth-plass-fill-with-bb memo-best-break))
+... : int * int * int -> (sym list -> sym list list)
+-> (fill-and-print (memo-knuth-plass-fill 57 3 3) gettysburg)
+(Four score and seven years ago our fathers brought forth)
+(on this continent a new nation, conceived in liberty, and)
+(dedicated to the proposition that all men are created equal.)
+-
+(Now we are engaged in a great civil war, testing whether)
+(that nation, or any nation, so conceived and so dedicated,)
+(can long endure. We are met on a great battle-field of that)
+(war. We have come to dedicate a portion of that field, as)
+(a final resting place for those who here gave their lives)
+(that that nation might live. It is altogether fitting and)
+(proper that we should do this.)
+-
+(But, in a larger sense, we can not dedicate, we can not)
+(consecrate, we can not hallow this ground. The brave men,)
+(living and dead, who struggled here, have consecrated it,)
+(far above our poor power to add or detract. The world will)
+(little note, nor long remember what we say here, but it can)
+(never forget what they did here. It is for us the living,)
+(rather, to be dedicated here to the unfinished work which)
+(they who fought here have thus far so nobly advanced. It)
+(is rather for us to be here dedicated to the great task)
+(remaining before us --- that from these honored dead we)
+(take increased devotion to that cause for which they gave)
+(the last full measure of devotion --- that we here highly)
+(resolve that these dead shall not have died in vain --- that)
+(this nation, under God, shall have a new birth of freedom)
+(--- and that government of the people, by the people, for)
+(the people, shall not perish from the earth.)

@@ -1,0 +1,41 @@
+-> (define int add1 ((int x)) (+ x 1))
+add1
+-> (add1 4)
+5
+-> (define int double ((int x)) (+ x x))
+double
+-> (double 4)
+8
+-> (if 1 77 88)
+type error: Condition in if expression has type int, which should be bool
+-> (if (= 0 0) 77 99)
+77
+-> (define (array (array int)) matrix-helper 
+      ; return square matrix of side length; a and i are for local use only
+      ((int length) ((array (array int)) a) (int i))
+     (begin
+       (set a (array-make length (array-make 0 0)))
+       (set i 0)
+       (while (< i length)
+          (begin
+            (array-set a i (array-make length 0))
+            (set i (+ i 1))))
+       a))
+-> (define (array (array int)) matrix ((int length))
+     (matrix-helper length (array-make 0 (array-make 0 0)) 0))
+-> (val a (matrix 3))
+[[0 0 0] [0 0 0] [0 0 0]]
+-> (val i 0)
+-> (val j 0)
+-> (while (< i 3) (begin
+      (set j 0)
+      (while (< j 3) (begin
+         (array-set (array-get a i) j (+ i j))
+         (set j (+ j 1))))
+      (set i (+ i 1))))
+-> a
+[[0 1 2] [1 2 3] [2 3 4]]
+-> (val a.1 (array-get a 1))
+[1 2 3]
+-> (val a.1.1 (array-get a.1 1))
+2

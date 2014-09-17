@@ -1,0 +1,32 @@
+-> length
+<procedure> : (forall ('a) (function ((list 'a)) int))
+-> cons
+<procedure> : (forall ('a) (function ('a (list 'a)) (list 'a)))
+-> car
+<procedure> : (forall ('a) (function ((list 'a)) 'a))
+-> cdr
+<procedure> : (forall ('a) (function ((list 'a)) (list 'a)))
+-> '()
+() : (forall ('a) (list 'a))
+-> (val length-int (@ length int))
+length-int : (function ((list int)) int)
+-> (val cons-bool (@ cons bool))
+cons-bool : (function (bool (list bool)) (list bool))
+-> pair
+<procedure> : (forall ('a 'b) (function ('a 'b) (pair 'a 'b)))
+-> (val car-pair (@ car (pair sym int)))
+car-pair : (function ((list (pair sym int))) (pair sym int))
+-> (val cdr-sym (@ cdr sym))
+cdr-sym : (function ((list sym)) (list sym))
+-> (val empty-int (@ '() int))
+() : (list int)
+-> (length-int '(1 4 9 16 25))
+5 : int
+-> (cons-bool #t '(#f #f))
+(#t #f #f) : (list bool)
+-> (car-pair ((@ cons (pair sym int)) 
+                ((@ pair sym int) 'Office 231) 
+                (@ '() (pair sym int))))
+(Office . 231) : (pair sym int)
+-> (cdr-sym '(a b c d))
+(b c d) : (list sym)

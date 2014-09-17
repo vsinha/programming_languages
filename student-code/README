@@ -1,0 +1,56 @@
+This directory contains source code for students to use with the
+book *Programming Languages: Build, Prove, and Compire*.
+This distribution does *not* include solutions to many exercises
+(garbage collection, type checking, unification, etc), so the
+interpreters are incomplete.  Binary code for complete interpreters
+should be available from your instructor.
+
+The interpreters, which are written in C and in ML, are available in
+two flavors.
+
+  * The `bare' flavor is bare, uncommented code extracted from the
+    book.  Code chunks are marked with their name and page numbers
+    using comments in the code.  
+
+  * The `commented' flavor is the same code, also extracted from the
+    book, but with comments taken from the book.  These comments are
+    extracted automatically, so the results aren't always what you
+    would hope for, but some people may find them useful.  
+
+Both flavors of code have been forced to fit into 80 columns using
+automated techniques, which sometimes split lines that are not split
+in the book.  Some lines of code, particularly in the garbage
+collector, contain a comment like /* OMIT */.  This comment marks code
+that would be distracting to include in the book text but which may be
+useful for doing some of the problems.
+
+Each of the two flavors appears in a directory of the same name, and
+each of these directories contains one subdirectory per interpreter.
+
+  impcore       Impcore implemented in C (Chapter 2)
+  uscheme       uScheme implemented in C (Chapter 3)
+  uscheme-copy  uScheme with support for copying collection (Chapter 4)
+  uscheme-ms    uScheme with support for mark/sweep collection (Chapter 4)
+  uscheme-ml    uScheme implemented in ML (Chapter 5)
+  timpcore      Typed Impcore implemented in ML (Chapter 6)
+  tuscheme      Typed uScheme implemented in ML (Chapter 6)
+  uml           uML (Chapter 7)
+  uhaskell      uHaskell (Chapter 9)
+  usmalltalk    uSmalltalk (Chapter 10)
+  uprolog       uProlog (Chapter 11)
+
+Each interpreter comes with a Makefile that does something, although
+in some cases the Makefile may be fairly specialized to the
+environment at Tufts and so may be less than useful to you.
+We use gcc, Moscow ML, and mlton to compile the interpreters.
+
+
+The top-level directories are organized as follows:
+
+  bare          Bare interpreters
+  commented     Commented interpreters
+  examples      A few example programs extracted from the text
+  exercises     Useful material for exercises (especially for adding
+                local variables to Impcore)
+  transcripts   Transcripts from some chapters.  These may be useful
+                for cutting and pasting code for some exercises.

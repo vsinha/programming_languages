@@ -1,0 +1,158 @@
+-> (isKindOf: 12 Object)
+<True>
+-> (use finance.smt)
+-> (val account (initialBalance: FinancialHistory 1000))
+-> (deposit:from: account 400 #salary)
+-> (withdraw:for: account 50 #plumber)
+-> (cashOnHand account)
+1350
+-> (withdraw:for: account 25 #plumber)
+-> (deposit:from: account 5 #lemonade-stand)
+-> (deposit:from: account 400 #salary)
+-> (totalWithdrawnFor: account #plumber)
+75
+-> (totalDepositedFrom: account #salary)
+800
+-> FinancialHistory
+<class FinancialHistory>
+-> (new FinancialHistory)
+<FinancialHistory>
+-> (isKindOf: FinancialHistory Class)
+<True>
+-> (isKindOf: (new FinancialHistory) Class)
+<False>
+-> (isKindOf: FinancialHistory Object)
+<True>
+-> (isKindOf: (new FinancialHistory) Object)
+<True>
+-> (val myaccount (initialBalance: FinancialHistory 1000)) 
+-> (withdraw:for: myaccount 50 #insurance) 
+-> (deposit:from: myaccount 200 #salary) 
+-> (cashOnHand myaccount) 
+1150
+-> (withdraw:for: myaccount 100 #books) 
+-> (cashOnHand myaccount) 
+1050
+-> (val myaccount (initialBalance: DeductibleHistory 1000))
+-> (withdraw:for: myaccount 50 #insurance)
+-> (deposit:from: myaccount 200 #salary)
+-> (cashOnHand myaccount)
+1150
+-> (totalDeductions myaccount)
+0
+-> (spend:deduct: myaccount 100 #mortgage)
+-> (cashOnHand myaccount)
+1050
+-> (totalDeductions myaccount)
+100
+-> (withdraw:for:deduct: myaccount 100 #3-martini-lunch 50)
+-> (cashOnHand myaccount)
+950
+-> (totalDeductions myaccount)
+150
+-> (class B Object ()
+     (method m1 () (m2 self))
+     (method m2 () #B))
+-> (class C B ()
+     (method m2 () #C))
+-> (val x (new C))
+-> (m1 x)
+C
+-> (isKindOf: 3 Number)
+<True>
+-> (isMemberOf: 3 Number)
+<False>
+-> (isKindOf: #3 Number)
+<False>
+-> (val index 0)
+-> [(set index (+ index 1))]
+<Block>
+-> index
+0
+-> (value [(set index (+ index 1))])
+1
+-> index
+1
+-> (val incrementBlock [(set index (+ index 1))])
+<Block>
+-> (val sumPlusIndexSquaredBlock [(+ sum (* index index))])
+<Block>
+-> (val sum 0)
+0
+-> (set sum (value sumPlusIndexSquaredBlock))
+1
+-> (value incrementBlock)
+2
+-> (set sum (value sumPlusIndexSquaredBlock))
+5
+-> (if (< sum 0) [#negative] [#positive])
+positive
+-> (if (< sum 0)  #negative   #positive )
+run-time error: Symbol does not understand message value
+Method-stack traceback:
+  Sent 'value' in initial basis, line 25
+  Sent 'ifTrue:ifFalse:' in initial basis, line 19
+  Sent 'if' in standard input, line 98
+-> (while [(< sum 10000)] [(set sum (* 5 sum)) (println sum)])
+25
+125
+625
+3125
+15625
+nil
+-> (val s (new Set))
+Set( )
+-> (size s)
+0
+-> (add: s 2)
+-> (add: s #abc)
+-> (includes: s 2)
+<True>
+-> (add: s 2)
+-> (size s)
+2
+-> (do: s (block (x) (println x)))
+2
+abc
+nil
+-> (set s (asSet #(1 2 3 1 2 3)))
+Set( 1 2 3 )
+-> (addAll: s #(1 2 3 a b c))
+( 1 2 3 a b c )
+-> (includes: s #b)
+<True>
+-> (size s)
+6
+-> (val s2 (reject: s (block (x) (isKindOf: x Number))))
+Set( a b c )
+-> (val l (new List))
+List( )
+-> (addLast: l #a)
+a
+-> (add: l #b)
+b
+-> l
+List( a b )
+-> (addFirst: l #z)
+-> (first l)
+z
+-> (addFirst: l #y)
+-> (at: l 3)
+a
+-> (removeFirst l)
+y
+-> l
+List( z a b )
+-> (val f1 (num:den: Fraction 2 1))
+-> (val eps (num:den: Fraction 1 10))
+1/10
+-> (val f2 (sqrtWithin: f1 eps))
+17/12
+-> (val eps (/ 1 100))
+1/100
+-> (val f2 (sqrtWithin: (asFraction 2) eps))
+577/408
+-> (val eps (asFloat (/ 1 10)))
+1x10^-1
+-> (sqrtWithin: (asFloat 2) eps)
+14166x10^-4

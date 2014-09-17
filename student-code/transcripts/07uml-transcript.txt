@@ -1,0 +1,22 @@
+-> (val nil '())
+() : forall 'a . 'a list
+-> (val p (pair (cons 1 nil) (cons '(a b c) nil)))
+((1) ((a b c))) : int list * sym list list
+-> (val nil '())
+() : forall 'a . 'a list
+-> (val p (pair (cons 1 nil) (cons #t nil)))
+((1) (#t)) : int list * bool list
+-> (val too-poly (lambda (nil) (pair (cons 1 nil) (cons #t nil))))
+type error: cannot make int equal to bool
+-> (val not-too-poly
+      (let ((nil '()))
+         (pair (cons 1 nil) (cons #t nil))))
+((1) (#t)) : int list * bool list
+-> (val singleton (lambda (x) (cons x '())))
+singleton : forall 'a . 'a -> 'a list
+-> (val broken (lambda (x) (cons x x)))
+type error: cannot make 'a equal to 'a list
+-> (val ss (lambda (y)
+              (let ((single (lambda (x) (cons x '()))))
+                 (single (single y)))))
+ss : forall 'a . 'a -> 'a list list
