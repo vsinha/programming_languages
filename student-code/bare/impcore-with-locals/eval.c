@@ -77,9 +77,19 @@ Value eval(Exp e, Valenv globals, Funenv functions, Valenv formals) {
                     Namelist  nl = f.u.userdef.formals;
                     Valuelist vl = evallist(e->u.apply.actuals, globals,
                                                             functions, formals);
+                    Namelist locals = f.u.userdef.locals;
+                    Valenv formalsEnv = NULL; /* lol C90 */
+
                     checkargc(e, lengthNL(nl), lengthVL(vl));
-                    return eval(f.u.userdef.body, globals, functions, mkValenv(
-                                                                       nl, vl));
+
+                    /* for each name in nl, if it is in locals, change the corresponding 
+                       value in vl to 0 to simulate setting a local variable */
+                    formalsEnv = mkValenv(nl, vl);
+                    for (nl=locals;  nl; nl=nl->tl) {
+                        bindval(nl->hd, 0, formalsEnv);
+                    }
+
+                    return eval(f.u.userdef.body, globals, functions, formalsEnv);
                 }
             case PRIMITIVE:
                 /* apply [[f.u.primitive]] and return the result 41a */
