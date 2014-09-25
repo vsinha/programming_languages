@@ -1,0 +1,10 @@
+My solution is a simple one:
+
+When we go to evaluate a user defined function, go through the Namelist of local variables,
+and for each local variable, simply (re)bind it with value 0 in the formalsEnv.
+
+This has the desired effect of auto-initialized local variables without the added overhead
+of another environment.
+
+
+-- Viraj
