@@ -1852,7 +1852,118 @@ fun appearsUnprotectedIn (x, e) =
 
 (* <type checking for {\tuscheme} ((prototype))>= *)
 exception LeftAsExercise of string
-fun elabdef _ = raise LeftAsExercise "elabdef"
+fun typeof e = 
+  case e of 
+       BOOL b => booltype
+     | NUM i => inttype
+     | SYM n => symtype
+     | PAIR (v1, v2) => tupletype( [typeof(v1), typeof(v2)] )
+     | NIL => unittype
+     | CLOSURE (l, vre) => raise LeftAsExercise "Clojure"
+     | PRIMITIVE p => raise LeftAsExercise "Primitive"
+
+fun elabexp (e, typenv, kindenv) = 
+  case e of 
+       LITERAL v => typeof v
+     | VAR (n)      => find(n, typenv)
+     | SET (var, e)    => 
+         let val tau_e = elabexp(e, typenv, kindenv)
+             val tau_var = find(var, typenv)
+         in
+           if eqType(tau_e, tau_var) then
+             tau_e
+           else raise TypeError "Attepting to assign incorrect type to variable"
+         end
+     | IFX (e1, e2, e3) => 
+         let val tau_e1 = elabexp(e1, typenv, kindenv)
+             val tau_e2 = elabexp(e2, typenv, kindenv)
+             val tau_e3 = elabexp(e3, typenv, kindenv)
+         in
+           if (eqType (tau_e1, booltype)) then 
+             if (eqType (tau_e2, tau_e3)) then
+               tau_e2
+             else raise TypeError "Both parts of 'if' are not same type"
+           else raise TypeError "Conditional is not a boolean"
+         end
+
+     | WHILEX (e1, e2) => 
+         let val tau_e1 = elabexp(e1, typenv, kindenv)
+             val tau_e2 = elabexp(e2, typenv, kindenv)
+         in
+           if (eqType (tau_e1, booltype)) then 
+               unittype
+           else raise TypeError "Conditional is not a boolean"
+         end
+
+     | BEGIN (e_list)   =>
+         let fun begin (h::nil) = elabexp(h, typenv, kindenv)
+               | begin (h::tail) = (elabexp(h, typenv, kindenv); begin(tail))
+               | begin (nil) = unittype
+         in
+           begin(e_list)
+         end
+     | APPLY (VAR ex, e_list)  => 
+         let 
+           fun recEval (h::t) =
+                let val eTau = elabexp(h, typenv, kindenv)
+                in
+                    eTau::recEval(t)
+                end
+             | recEval (nil) = nil
+
+           val paramTypes = recEval(e_list)
+           val findresult = find(ex, typenv)
+         in
+            case findresult of 
+              (CONAPP (TYCON "function", [CONAPP (TYCON "tuple",args),result])) => 
+                if (args = paramTypes) then result
+                else raise TypeError "Invalid function arguments"
+            | _ => raise TypeError "Failed function lookup"
+              
+         end
+     | APPLY (_, e_list) => raise TypeError "Function name must be a string"
+
+     | LETX (k, varlist, e) => 
+       let fun letall(LET, varlist, ex) =
+              let fun recTyp ((var, exp)::tail, tenv) = 
+                        recTyp(tail, bind(var, elabexp(exp, typenv, kindenv),tenv))
+                    | recTyp (nil, tenv) = tenv
+              in 
+                elabexp(ex, recTyp(varlist, typenv), kindenv)
+              end
+        | letall(LETSTAR, varlist, ex) = raise LeftAsExercise ""
+      in
+        letall(k, varlist, e)
+      end
+
+     | LAMBDA (l) => raise LeftAsExercise ""
+     | TYLAMBDA (n::tl, e) => raise LeftAsExercise ""
+     | TYAPPLY (e, tyexp::tl) => raise LeftAsExercise ""
+     | _ => typeof NIL
+
+fun elabdef (d, typenv, kindenv) = 
+  case d of 
+       VAL (x, e) => 
+          let val tau_e = elabexp(e, typenv, kindenv)
+          in (bind(x, tau_e, typenv), typeString(tau_e))
+          end
+              
+     | VALREC (n, t, e) => raise LeftAsExercise ""
+     | EXP (e) => 
+          let val resTau = elabexp(e, typenv, kindenv)
+          in
+            (typenv, typeString(resTau))
+          end
+
+     | DEFINE (n, t, l) => raise LeftAsExercise ""
+     | USE (n) => raise LeftAsExercise ""
+
+val _ = op elabdef : def * tyex env * kind env -> tyex env * string
+val _ = op elabexp : exp * tyex env * kind env -> tyex
+val _ = op typeof : value -> tyex
+
+
+
 (* Type checking                                *)
 (*                                              *)
 (* This book does not provide a type checker for Typed *)
@@ -1863,8 +1974,6 @@ fun elabdef _ = raise LeftAsExercise "elabdef"
 (* ', s), where \toptt -->Gamma' and s is a string that *)
 (* represents the type of the thing defined. [*] *)
 (* <boxed values 9>=                            *)
-val _ = op elabdef : def * tyex env * kind env -> tyex env * string
-
 
 (*****************************************************************)
 (*                                                               *)
@@ -2428,7 +2537,9 @@ val initialEnvs =
                      (* the same way that types classify expressions. *)
  nil)
       val envs    = (kinds, types, values)
-      val basis   = (* Further reading                              *)
+    val basis_included = false
+      val basis   = if not basis_included then [] else 
+        (* Further reading                              *)
                     (*                                              *)
                     (* \citetkoenig:anecdote describes an experience with *)
                     (* ML type inference which leads to a conclusion that *)
