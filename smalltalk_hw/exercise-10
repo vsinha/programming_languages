@@ -1,0 +1,77 @@
+(class Collection Object
+  () ; abstract
+  (method do:     (aBlock)    (subclassResponsibility self))
+  (method add:    (newObject) (subclassResponsibility self))
+  (method remove:ifAbsent: (oldObject exnBlock)
+                              (subclassResponsibility self))
+  (method species ()          (subclassResponsibility self))
+  
+;;;usm.nw:4409
+(class-method with: (anObject) (locals temp)
+    (set temp (new self))
+    (add: temp anObject)
+    temp)
+;;;usm.nw:4426
+(method remove: (oldObject) 
+    (remove:ifAbsent: self oldObject [(error: self #tried-to-remove-absent-object)]))
+(method addAll: (aCollection) 
+    (do: aCollection (block (x) (add: self x)))
+    aCollection)
+(method removeAll: (aCollection) 
+    (do: aCollection (block (x) (remove: self x)))
+    aCollection)
+;;;usm.nw:4450
+(method isEmpty () (= (size self) 0))
+(method size () (locals temp)
+    (set temp 0)
+    (do: self (block (_) (set temp (+ temp 1))))
+    temp)
+(method occurrencesOf: (anObject) (locals temp)
+    (set temp 0)
+    (do: self (block (x)
+       (ifTrue: (= x anObject) [(set temp (+ temp 1))])))
+    temp)
+(method includes: (anObject) (< 0 (occurrencesOf: self anObject)))
+(method detect: (aBlock) 
+    (detect:ifNone: self aBlock [(error: self #no-object-detected)]))
+
+
+(method detect:ifNone: (aBlock exnBlock) (locals answer searching)
+    (set searching true)
+    (do: self (block (x)
+        (ifTrue: (and: searching [(value aBlock x)])
+             [(set searching false)
+              (set answer x)])))
+    (if searching exnBlock [answer]))
+
+
+;;;usm.nw:4498
+(method inject:into: (thisValue binaryBlock)
+   (do: self (block (x) (set thisValue (value binaryBlock x thisValue))))
+   thisValue)
+;;;usm.nw:4509
+(method select: (aBlock) (locals temp)
+   (set temp (new (species self)))
+   (do: self (block (x) (ifTrue: (value aBlock x) [(add: temp x)])))
+   temp)
+(method reject: (aBlock)
+   (select: self (block (x) (not (value aBlock x)))))
+(method collect: (aBlock) (locals temp)
+   (set temp (new (species self)))
+   (do: self (block (x) (add: temp (value aBlock x))))
+   temp)
+;;;usm.nw:4522
+(method asSet () (locals temp)
+     (set temp (new Set))
+     (do: self (block (x) (add: temp x)))
+     temp)
+;;;usm.nw:4531
+(method print ()
+    (printName self)
+    (print lparen)
+    (do: self (block (x) (print space) (print x)))
+    (print space)
+    (print rparen)
+    self)
+(method printName () (print #Collection))
+)

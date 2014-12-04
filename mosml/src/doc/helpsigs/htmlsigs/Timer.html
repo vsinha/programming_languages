@@ -1,0 +1,57 @@
+<HTML><HEAD><TITLE>Structure Timer</TITLE></HEAD>
+<BODY BGCOLOR="#fbf2e7">
+<H1>Structure Timer</H1>
+<HR><TABLE WIDTH=100%><TR ALIGN = CENTER>
+<TH><A HREF="idIndex.html">Identifier index</A>
+<TH><A HREF="index.html">Structure index</A>
+</TABLE><HR>
+<PRE>
+<A NAME="line1"></A>(* Timer -- SML Basis Library *)
+<A NAME="line2"></A>
+<A NAME="line3"></A>type <A HREF="#cpu_timer-typ">cpu_timer</A>
+<A NAME="line4"></A>type <A HREF="#real_timer-typ">real_timer</A>
+<A NAME="line5"></A>
+<A NAME="line6"></A>val <A HREF="#startCPUTimer-val">startCPUTimer</A>  : unit -&gt; cpu_timer
+<A NAME="line7"></A>val <A HREF="#totalCPUTimer-val">totalCPUTimer</A>  : unit -&gt; cpu_timer
+<A NAME="line8"></A>val <A HREF="#checkCPUTimer-val">checkCPUTimer</A>  : cpu_timer -&gt; 
+<A NAME="line9"></A>                     { usr : Time.time, sys : Time.time, gc : Time.time }
+<A NAME="line10"></A>
+<A NAME="line11"></A>val <A HREF="#startRealTimer-val">startRealTimer</A> : unit -&gt; real_timer
+<A NAME="line12"></A>val <A HREF="#totalRealTimer-val">totalRealTimer</A> : unit -&gt; real_timer
+<A NAME="line13"></A>val <A HREF="#checkRealTimer-val">checkRealTimer</A> : real_timer -&gt; Time.time
+<A NAME="line14"></A>
+<A NAME="line15"></A>(* 
+   [<A NAME="cpu_timer-typ"><B>cpu_timer</B></A>] is the type of timers for measuring CPU time consumption
+   (user time, garbage collection time, and system time).
+
+   [<A NAME="real_timer-typ"><B>real_timer</B></A>] is the type of timers for measuring the passing of
+   real time (wall-clock time).
+
+   [<A NAME="startCPUTimer-val"><B>startCPUTimer</B></A> ()] returns a cpu_timer started at the moment of 
+   the call.
+
+   [<A NAME="totalCPUTimer-val"><B>totalCPUTimer</B></A> ()] returns a cpu_timer started at the moment the 
+   library was loaded.
+
+   [<A NAME="checkCPUTimer-val"><B>checkCPUTimer</B></A> tmr] returns {usr, sys, gc} where usr is the amount
+   of user CPU time consumed since tmr was started, gc is the amount
+   of user CPU time spent on garbage collection, and sys is the
+   amount of system CPU time consumed since tmr was started.  Note
+   that gc time is included in the usr time.  Under MS DOS, usr time
+   and gc time are measured in real time.
+
+   [<A NAME="startRealTimer-val"><B>startRealTimer</B></A> ()] returns a real_timer started at the moment of 
+   the call.
+
+   [<A NAME="totalRealTimer-val"><B>totalRealTimer</B></A> ()] returns a real_timer started at the moment the 
+   library was loaded.
+
+   [<A NAME="checkRealTimer-val"><B>checkRealTimer</B></A> tmr] returns the amount of real time that has passed
+   since tmr was started.
+*)
+
+</PRE><HR><TABLE WIDTH=100%><TR ALIGN = CENTER>
+<TH><A HREF="idIndex.html">Identifier index</A>
+<TH><A HREF="index.html">Structure index</A>
+</TABLE><HR>
+<BR><EM><A HREF="http://www.dina.kvl.dk/~sestoft/mosml.html">Moscow ML</A> 2.00</EM></BODY></HTML>

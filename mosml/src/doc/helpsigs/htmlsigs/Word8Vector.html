@@ -1,0 +1,48 @@
+<HTML><HEAD><TITLE>Structure Word8Vector</TITLE></HEAD>
+<BODY BGCOLOR="#fbf2e7">
+<H1>Structure Word8Vector</H1>
+<HR><TABLE WIDTH=100%><TR ALIGN = CENTER>
+<TH><A HREF="idIndex.html">Identifier index</A>
+<TH><A HREF="index.html">Structure index</A>
+</TABLE><HR>
+<PRE>
+<A NAME="line1"></A>(* Word8Vector -- SML Basis Library *)
+<A NAME="line2"></A>
+<A NAME="line3"></A>eqtype <A HREF="#vector-typ">vector</A>
+<A NAME="line4"></A>type elem = Word8.word
+<A NAME="line5"></A>
+<A NAME="line6"></A>val maxLen   : int
+<A NAME="line7"></A>
+<A NAME="line8"></A>val fromList : elem list -&gt; vector
+<A NAME="line9"></A>val tabulate : int * (int -&gt; elem) -&gt; vector
+<A NAME="line10"></A>
+<A NAME="line11"></A>val length   : vector -&gt; int
+<A NAME="line12"></A>val sub      : vector * int -&gt; elem
+<A NAME="line13"></A>val extract  : vector * int * int option -&gt; vector
+<A NAME="line14"></A>val concat   : vector list -&gt; vector
+<A NAME="line15"></A>
+<A NAME="line16"></A>val app      : (elem -&gt; unit) -&gt; vector -&gt; unit
+<A NAME="line17"></A>val map      : (elem -&gt; elem) -&gt; vector -&gt; vector
+<A NAME="line18"></A>val foldl    : (elem * 'b -&gt; 'b) -&gt; 'b -&gt; vector -&gt; 'b
+<A NAME="line19"></A>val foldr    : (elem * 'b -&gt; 'b) -&gt; 'b -&gt; vector -&gt; 'b
+<A NAME="line20"></A>
+<A NAME="line21"></A>val appi     : (int * elem -&gt; unit) -&gt; vector * int * int option -&gt; unit
+<A NAME="line22"></A>val mapi     : (int * elem -&gt; elem) -&gt; vector * int * int option -&gt; vector
+<A NAME="line23"></A>val foldli   : (int * elem * 'b -&gt; 'b) -&gt; 'b -&gt; vector*int*int option -&gt; 'b
+<A NAME="line24"></A>val foldri   : (int * elem * 'b -&gt; 'b) -&gt; 'b -&gt; vector*int*int option -&gt; 'b
+<A NAME="line25"></A>
+<A NAME="line26"></A>(* 
+   [<A NAME="vector-typ"><B>vector</B></A>] is the type of one-dimensional, immutable, zero-based
+   constant-time-access vectors with elements of type Word8.word, that
+   is, 8-bit words.  Type vector admits equality, and vectors v1 and
+   v2 are equal if they have the same length and their elements are
+   equal.
+
+   All operations are as for Vector.vector.
+*)
+
+</PRE><HR><TABLE WIDTH=100%><TR ALIGN = CENTER>
+<TH><A HREF="idIndex.html">Identifier index</A>
+<TH><A HREF="index.html">Structure index</A>
+</TABLE><HR>
+<BR><EM><A HREF="http://www.dina.kvl.dk/~sestoft/mosml.html">Moscow ML</A> 2.00</EM></BODY></HTML>

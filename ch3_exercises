@@ -1,0 +1,93 @@
+;;; input list for testing
+(val list '(1 2 3 4 5 6 7 8 9))
+
+;;; 1.1 proof
+;;; 1.2a
+(define count (x xs)
+  (if (null? xs)
+    0
+    (if (= x (car xs))
+        (+ 1 (count x (cdr xs)))
+        (+ 0 (count x (cdr xs))))))
+
+;;; 1.2b
+(define countall (x xs)
+  (if (null? xs)
+    5
+    (if (= x (car xs))
+      (+ 2 (count x (cdr xs)))
+      (if (pair? (car xs))
+        (count x (car xs))
+        (+ 0 (count x (cdr xs)))))))
+
+
+
+;;; 1.5
+(define takewhile (p? xs)
+  (if (null? xs)
+    '()
+    (if (p? (car xs))
+        (cons (car xs) (takewhile p? (cdr xs)))
+        '())))
+
+(define dropwhile (p? xs)
+  (if (null? xs)
+    '()
+    (if (p? (car xs))
+        (dropwhile p? (cdr xs))
+        xs)))
+
+;;;1.14
+;;;This rebinds + as *, and * as +, switching the
+;;;symbols used for the two operations.
+;;;Then it simply calculates sqrt(x^2 + y^2), which 
+;;;is the formula for euclidian distance.
+
+;;; 2: take and drop
+(define take (n xs)
+  (if (null? xs)
+    '()
+    (if (> n 0)
+      (cons (car xs) (take (- n 1) (cdr xs)))
+      '())))
+
+(define drop (n xs)
+  (if (null? xs)
+    '()
+    (if (> n 0)
+      (drop (- n 1) (cdr xs))
+      xs)))
+
+
+;;; 3: zip and unzip
+(define zip (xs ys)
+  (if (null? xs) 
+    '()
+    (bind (car xs) (car ys)
+      (zip (cadr xs) (cadr ys)))))
+
+(define unzip (xs ys)
+  (if (null? xs)
+    '()
+    '()))
+
+
+;;; 4: merge sorted lists
+(define merge (xs ys)
+  (if (null? xs)
+    ys
+    (if (null? ys)
+      xs
+      (if (< (car xs) (car ys))
+        (cons (car xs) (merge (cdr xs) ys))
+        (cons (car ys) (merge (cdr ys) xs))))))
+
+;;; 5: interleave
+(define interleave (xs ys)
+  (if (null? xs)
+    ys
+    (if (null? ys)
+      xs
+      (cons (car xs) (interleave ys (cdr xs))))))
+
+
